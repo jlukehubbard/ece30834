@@ -65,11 +65,12 @@ void Camera::updateViewProj() {
 	switch (this -> camType) {
 	case GROUND_VIEW:
 	case OVERHEAD_VIEW:
-		this -> proj = glm::perspective<GLdouble>(fovy, aspect, 0.1, 150.0);
-		//this -> view = ViewPitchYaw(camPos, 45.0f, camRot);
+		//this -> proj = glm::perspective<GLdouble>(fovy, aspect, 0.1, 150.0);
+		this -> view = ViewPitchYaw(camPos, 0.0f, camRot);
 		//break;
-		//this -> proj = glm::ortho<GLdouble>(-GLDFHALF(width), GLDFHALF(width), -GLDFHALF(height), GLDFHALF(height), 0.1, 1000.0);
-		this -> view = LookAt(camPos, camPos + camDir, glm::normalize(camDir + glm::vec3(0.0f, 10.0f, 0.0f)));
+		this -> proj = glm::ortho<GLdouble>(-GLDFHALF(width), GLDFHALF(width), -GLDFHALF(height), GLDFHALF(height), 0.1, 1000.0);
+		//this -> view = LookAt(camPos, camPos + camDir, glm::normalize(camDir + glm::vec3(0.0f, 1.0f, 0.0f)));
+		//this -> view = LookAt(camPos, glm::vec3(camPos.x, -1.0, camPos.z), camDir);
 	}
 
 
