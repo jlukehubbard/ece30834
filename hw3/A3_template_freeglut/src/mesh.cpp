@@ -125,7 +125,12 @@ void Mesh::load(std::string filename, bool keepLocalGeometry) {
 
 		// TODO: =========================================================
 		// Calculate tangent and bitangent for each triangle and store in the arrays: "tangent" and "bitangent", SEE LINE 118-119
-		
+		glm::vec3 ehat = glm::normalize(v1 - v0);
+		glm::vec3 t = glm::cross(ehat, raw_normals[v_elements[i+0][2]]);
+		glm::vec3 b = glm::cross(t, raw_normals[v_elements[i+0][2]]);
+
+		tangents[i+0] = tangents[i+1] = tangents[i+2] = t;
+		bitangents[i+0] = bitangents[i+1] = bitangents[i+2] = b;
 	}
 
 	// Create vertex array
@@ -148,6 +153,8 @@ void Mesh::load(std::string filename, bool keepLocalGeometry) {
 
 		// TODO: =========================================================
 		// Store tangent and bitangent computed earlier in "vertices" array
+		vertices[i+0].tangent = vertices[i+1].tangent = vertices[i+2].tangent = tangents[i];
+		vertices[i+0].bitangent = vertices[i+1].bitangent = vertices[i+2].bitangent = bitangents[i];
 		
 	}
 	vcount = (GLsizei)vertices.size();
