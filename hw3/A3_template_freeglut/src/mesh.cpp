@@ -125,12 +125,29 @@ void Mesh::load(std::string filename, bool keepLocalGeometry) {
 
 		// TODO: =========================================================
 		// Calculate tangent and bitangent for each triangle and store in the arrays: "tangent" and "bitangent", SEE LINE 118-119
-		glm::vec3 ehat = glm::normalize(v1 - v0);
-		glm::vec3 t = glm::cross(ehat, raw_normals[v_elements[i+0][2]]);
-		glm::vec3 b = glm::cross(t, raw_normals[v_elements[i+0][2]]);
 
-		tangents[i+0] = tangents[i+1] = tangents[i+2] = t;
-		bitangents[i+0] = bitangents[i+1] = bitangents[i+2] = b;
+		glm::vec3 t, b, e1, e2;
+		glm::vec2 uv1, uv2, uv3, duv1, duv2;
+		uv1 = raw_uvs[v_elements[i+0][1]];
+		uv2 = raw_uvs[v_elements[i+1][1]];
+		uv3 = raw_uvs[v_elements[i+2][1]];
+		e1 = v1 - v0;
+		e2 = v2 - v0;
+		duv1 = uv2 - uv1;
+		duv2 = uv3 - uv1;
+
+		float f = 1.0f / (duv1.x * duv2.y - duv2.x * duv1.y);
+
+		t.x = f * (duv2.y * e1.x - duv1.y * e2.x);
+		t.y = f * (duv2.y * e1.y - duv1.y * e2.y);
+		t.z = f * (duv2.y * e1.z - duv1.y * e2.z);
+
+		b.x = f * (-duv2.x * e1.x + duv1.x * e2.x);
+		b.y = f * (-duv2.x * e1.y + duv1.x * e2.y);
+		b.z = f * (-duv2.x * e1.z + duv1.x * e2.z);
+
+		tangents[i+0] = t;
+		bitangents[i+0] = b;
 	}
 
 	// Create vertex array
