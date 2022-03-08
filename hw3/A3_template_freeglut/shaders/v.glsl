@@ -69,6 +69,15 @@ void main() {
 	// Construct TBN (a mat3 transform matrix) coordinate system
 	// Then convert "lights[0].pos", "camPos", and "fragPos" to tangent space: light position ("tanLightPos"), camera position ("tanViewer") and fragment position ("tanFragPos") to tangent space
 
+	//Convert TBN vectors to world space
+	vec3 T = normalize(vec3(modelMat * vec4(tangent, 0.0)));
+	vec3 B = normalize(vec3(modelMat * vec4(bitangent, 0.0)));
+	vec3 N = normalize(vec3(modelMat * vec4(norm, 0.0)));
+	mat3 TBN = mat3(T, B, N);
+	//tanLightPos = normalize(TBN * lights[0].pos);
+	//tanViewer = normalize(TBN * camPos);
+	//tanFragPos = normalize(TBN * fragPos);
+
 	// Pass the interpolated texture coordinates to the fragment shader
 	fragUV = uv;
 
