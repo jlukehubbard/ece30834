@@ -90,8 +90,8 @@ void GLState::paintGL() {
 	// Remember the light is directional so its projection should be an orthographic projection
 	
 	glm::mat4 lightView = glm::lookAt(lights[0].getPos(), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::mat4 lightProj = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
-	glm::mat4 lightSpaceMat = glm::mat4(lightProj * lightView);
+	glm::mat4 lightProj = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 100.0f);
+	glm::mat4 lightSpaceMat = lightProj * lightView;
 	
 
 	// Pass the transform matrix to the depth shader

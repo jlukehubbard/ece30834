@@ -74,9 +74,9 @@ float calculateShadow(vec4 light_frag_pos) {  // TODO: add other parameters if n
 	// TODO: =========================================================
 	// Decide whether a fragment is in shadow
 	// Read the depth from depth map, then compare it with the depth of the current fragment
-	float mapDepth = texture(shadowMap, light_frag_pos.xy).x;
+	float mapDepth = texture(shadowMap, projCoords.xy).r;
 
-	if (light_frag_pos.z < mapDepth) {
+	if (projCoords.z > mapDepth) {
 		return 1.0;
 	} else {
 		return 0.0;
@@ -155,7 +155,7 @@ void main() {
 					shadow = calculateShadow(lightFragPos);  // TODO: add more parameters if necessary
 				else if (shadowMapMode == SHADOW_MAPPING_OFF)
 					shadow = 0.0;
-				outCol += (ambient + diffuse) * lights[i].color;  // TODO: use "shadow" variable here
+				outCol += (ambient + ((1.0f - shadow) * diffuse)) * lights[i].color;  // TODO: use "shadow" variable here
 			}
 		}
 		outCol *= objColor;
