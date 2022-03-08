@@ -88,7 +88,10 @@ void GLState::paintGL() {
 	// Calculate the matrix "lightSpaceMat" to do world-to-light space transform
 	// This matrix contains a projection and a view matrix from the light "lights[0]"
 	// Remember the light is directional so its projection should be an orthographic projection
-	glm::mat4 lightSpaceMat = glm::mat4(1.0f);
+	
+	glm::mat4 lightView = glm::lookAt(lights[0].getPos(), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 lightProj = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
+	glm::mat4 lightSpaceMat = glm::mat4(lightProj * lightView);
 	
 
 	// Pass the transform matrix to the depth shader

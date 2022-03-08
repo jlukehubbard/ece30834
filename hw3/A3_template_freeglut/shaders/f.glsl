@@ -74,9 +74,13 @@ float calculateShadow(vec4 light_frag_pos) {  // TODO: add other parameters if n
 	// TODO: =========================================================
 	// Decide whether a fragment is in shadow
 	// Read the depth from depth map, then compare it with the depth of the current fragment
-	
-	// return a binary representing whether there is shadow (0.0 or 1.0)
-	return 0.0;  // TODO: remove this line after you have implemented this
+	float mapDepth = texture(shadowMap, light_frag_pos.xy).x;
+
+	if (light_frag_pos.z < mapDepth) {
+		return 1.0;
+	} else {
+		return 0.0;
+	}
 }
 
 void main() {
@@ -113,6 +117,7 @@ void main() {
 				if (normalMapMode == NORMAL_MAPPING_ON && objType == OBJTYPE_CUBE) {
 					// TODO: =========================================================
 					// Get the fragment normal, store it in "normal" SEE LINE 111
+					normal = normalize(texture(texCubeNorm, fragUV).xyz);
 				}
 				else
 					normal = normalize(fragNorm);
@@ -124,6 +129,7 @@ void main() {
 					if (normalMapMode == NORMAL_MAPPING_ON && objType == OBJTYPE_CUBE) {
 						// TODO: =========================================================
 						// Get vector to the light in tangent space, store it in "lightDir", SEE LINE 120
+						lightDir = normalize(tanLightPos);
 					}
 					else
 						lightDir = normalize(lights[i].pos);
@@ -137,6 +143,7 @@ void main() {
 				if (normalMapMode == NORMAL_MAPPING_ON && objType == OBJTYPE_CUBE) {
 					// TODO: =========================================================
 					// Get vector to the viewer in tangent space, store it in "viewDir", SEE LINE 136
+					viewDir = normalize(tanViewer - tanFragPos);
 				}
 				else
 					viewDir = normalize(camPos - fragPos);

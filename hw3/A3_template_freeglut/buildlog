@@ -1,0 +1,1 @@
+g++ -std=c++17 src/main.cpp src/glstate.cpp src/mesh.cpp src/light.cpp src/texture.cpp src/util.cpp src/gl_core_3_3.c -lGL -lglut -o base_freeglut

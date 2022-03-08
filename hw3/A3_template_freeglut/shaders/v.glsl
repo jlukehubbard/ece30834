@@ -75,9 +75,9 @@ void main() {
 	vec3 N = normalize(vec3(modelMat * vec4(norm, 0.0)));
 	mat3 TBN = mat3(T, B, N);
 	mat3 TBNinv = transpose(TBN); //orthogonal matrix, transpose is inverse
-	tanLightPos = normalize(TBNinv * lights[0].pos);
-	tanViewer = normalize(TBNinv * camPos);
-	tanFragPos = normalize(TBNinv * fragPos);
+	tanLightPos = TBNinv * lights[0].pos;
+	tanViewer = TBNinv * camPos;
+	tanFragPos = TBNinv * fragPos;
 
 	// Pass the interpolated texture coordinates to the fragment shader
 	fragUV = uv;
