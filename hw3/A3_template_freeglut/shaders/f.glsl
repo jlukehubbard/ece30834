@@ -65,7 +65,7 @@ uniform float cubeDiffStr;			// Diffuse strength
 uniform float cubeSpecStr;			// Specular strength
 uniform float cubeSpecExp;			// Specular exponent
 
-float calculateShadow(vec4 light_frag_pos) {  // TODO: add other parameters if needed
+float calculateShadow(vec4 light_frag_pos, vec3 lightDir, vec3 normal) {  // TODO: add other parameters if needed
 	// Perspective divide
 	vec3 projCoords = light_frag_pos.xyz / light_frag_pos.w;
 	// Remap to [0.0, 1.0]
@@ -75,12 +75,9 @@ float calculateShadow(vec4 light_frag_pos) {  // TODO: add other parameters if n
 	// Decide whether a fragment is in shadow
 	// Read the depth from depth map, then compare it with the depth of the current fragment
 	float mapDepth = texture(shadowMap, projCoords.xy).r;
-
-	if (projCoords.z > mapDepth) {
-		return 1.0;
-	} else {
-		return 0.0;
-	}
+	float bias = 0.0; //max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+	float shadow = ((projCoords.z - bias) > mapDepth) ? 1.0 : 0.0;
+	return shadow;
 }
 
 void main() {
@@ -152,7 +149,7 @@ void main() {
 				// Calculate shadow using the function calculateShadow, and modify the line (calculating the final color) below
 				float shadow;
 				if (shadowMapMode == SHADOW_MAPPING_ON)
-					shadow = calculateShadow(lightFragPos);  // TODO: add more parameters if necessary
+					shadow = calculateShadow(lightFragPos, lightDir, normal);  // TODO: add more parameters if necessary
 				else if (shadowMapMode == SHADOW_MAPPING_OFF)
 					shadow = 0.0;
 				outCol += (ambient + ((1.0f - shadow) * diffuse)) * lights[i].color;  // TODO: use "shadow" variable here
