@@ -93,7 +93,7 @@ void initGLUT(int* argc, char** argv) {
 	width = 800; height = 600;
 	glutInit(argc, argv);
 	glutInitWindowSize(width, height);
-	glutInitContextVersion(3, 3);
+	//glutInitContextVersion(3, 3);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	// Create the window
