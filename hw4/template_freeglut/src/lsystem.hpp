@@ -8,6 +8,8 @@
 #include <glm/glm.hpp>
 #include "gl_core_3_3.h"
 
+#define MAXRULES 10
+
 class LSystem {
 public:
 	LSystem();

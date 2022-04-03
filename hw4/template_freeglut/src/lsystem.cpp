@@ -99,10 +99,34 @@ void LSystem::parse(std::istream& istr) {
 	// Store the number of iterations in "inIters"
 	// Store the axiom in "inAxiom"
 	// Store the set of rules in "inRules"
+	
+	istr >> inAngle;
+	istr >> inIters;
+	istr >> inAxiom;
 
+	std::string pred, delim;
+	for (size_t i = 0; i < MAXRULES; i++) {
+		istr >> pred >> delim;
+		if (delim[0] == ':') {
+			istr >> inRules[pred[0]];
+			continue;
+		}
+		break;
+	}
+
+#define PARSE_DEBUG
+#ifdef PARSE_DEBUG
+	std::cout << inAngle << std::endl;
+	std::cout << inIters << std::endl;
+	std::cout << inAxiom << std::endl;
+
+	for (const auto& elem : inRules) {
+		std::cout << elem.first << " : " << elem.second << std::endl;
+	}
+#endif /* PARSE_DEBUG */
 
 	// Remove this line
-	throw std::runtime_error("Parser not implemented");
+	//throw std::runtime_error("Parser not implemented");
 
 
 
