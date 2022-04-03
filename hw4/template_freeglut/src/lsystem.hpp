@@ -69,6 +69,20 @@ private:
 	static GLuint shader;				// Shader program
 	static GLuint xformLoc;				// Location of matrix uniform
 	void initShader();					// Create the shader program
+	typedef struct ldrawstate {
+		float facing;
+		glm::vec2 position;
+		ldrawstate() : facing(0.0f), position(glm::vec2(0.0f)) {};
+	} LDrawState;
+
+	std::vector<LDrawState*> drawStack;
+	LDrawState *currState;
+	void drawPush();
+	void drawPop();
+	void drawAndAdvance(LDrawState *curr, std::vector<glm::vec2> &verts);
+	void onlyAdvance(LDrawState *curr);
+	void rotateWiddershins(LDrawState *curr);
+	void rotateSunwise(LDrawState *curr);
 };
 
 #endif

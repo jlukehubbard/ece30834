@@ -16,17 +16,20 @@ unsigned int LSystem::refcount = 0;
 GLuint LSystem::shader = 0;
 GLuint LSystem::xformLoc = 0;
 
+
 // Constructor
 LSystem::LSystem() :
 	angle(0.0f),
 	vao(0),
 	vbo(0),
-	bufSize(0) {
+	bufSize(0),
+	drawStack(std::vector<LSystem::LDrawState *>()),
+	currState(new LSystem::LDrawState) {
 
-	// Create shader if we're the first object
-	if (refcount == 0)
+		// Create shader if we're the first object
+		if (refcount == 0)
 		initShader();
-	refcount++;
+		refcount++;
 }
 
 // Destructor
@@ -35,6 +38,7 @@ LSystem::~LSystem() {
 	if (vao) { glDeleteVertexArrays(1, &vao); vao = 0; }
 	if (vbo) { glDeleteBuffers(1, &vbo); vbo = 0; }
 	bufSize = 0;
+	delete currState;
 
 	refcount--;
 	// Destroy shader if we're the last object
@@ -114,7 +118,7 @@ void LSystem::parse(std::istream& istr) {
 		break;
 	}
 
-#define PARSE_DEBUG
+//#define PARSE_DEBUG
 #ifdef PARSE_DEBUG
 	std::cout << inAngle << std::endl;
 	std::cout << inIters << std::endl;
@@ -124,12 +128,6 @@ void LSystem::parse(std::istream& istr) {
 		std::cout << elem.first << " : " << elem.second << std::endl;
 	}
 #endif /* PARSE_DEBUG */
-
-	// Remove this line
-	//throw std::runtime_error("Parser not implemented");
-
-
-
 
 	// Make your changes above this line
 	// END TODO ===============================================================
@@ -225,9 +223,26 @@ std::string LSystem::applyRules(std::string string) {
 	// TODO: ==================================================================
 	// Apply rules to the input string
 	// Return the resulting string
+	
+	std::string ret = "";
 
-	// Replace this line with your implementation
-	return "";
+
+	for (auto& c : string) {
+		size_t replaced = 0;
+		for (auto &[pred, succ] : rules) {
+			if (c == pred && ++replaced) {
+				ret += succ;
+			}
+//#define APPLY_DEBUG
+#ifdef APPLY_DEBUG
+			std::cout << ret << std::endl;
+#endif /* APPLY_DEBUG */
+		}
+		if (!replaced) ret += c;
+	}
+
+	return ret;
+
 }
 
 // Generate the geometry corresponding to the string at the given iteration
@@ -238,9 +253,74 @@ std::vector<glm::vec2> LSystem::createGeometry(std::string string) {
 	// Generate geometry from a string
 	// Return a vector of vertices, with every two vertices making a 2D line
 	// segment.
+	
+	currState -> facing = 90.0f;
+	currState -> position = glm::vec2(0);
+	
+	for (auto& c : string) {
+		switch (c) {
+			case 'f':	//Draw and advance
+			case 'F':	//Draw and advance
+			case 'g':	//Draw and advance
+			case 'G':	//Draw and advance
+				LSystem::drawAndAdvance(currState, verts);
+				break;
+			case 's':	//Advance only
+			case 'S':	//Advance only
+				LSystem::onlyAdvance(currState);
+				break;
+			case '+':	//Rotate widdershins
+				LSystem::rotateWiddershins(currState);
+				break;
+			case '-':	//Rotate sunwise
+				LSystem::rotateSunwise(currState);
+				break;
+			case '[':	//Push draw state
+				drawPush();
+				break;
+			case ']':	//Pop draw state
+				drawPop();
+				break;
+		}
+	}
 
 	return verts;
 }
+
+void LSystem::drawPush() {
+	drawStack.push_back(currState);
+	auto newState = new LSystem::LDrawState;
+	newState -> facing = currState -> facing;
+	newState -> position = currState -> position;
+	currState = newState;
+}
+
+void LSystem::drawPop() {
+	if (drawStack.size()) {
+		delete currState;
+		currState = drawStack.back();
+		drawStack.pop_back();
+	}
+}
+
+void LSystem::drawAndAdvance(LSystem::LDrawState *curr, std::vector<glm::vec2> &verts) {
+	verts.push_back(curr -> position);
+	curr -> position += glm::vec2(glm::cos(glm::radians(curr -> facing)), glm::sin(glm::radians(curr -> facing)));
+	verts.push_back(curr -> position);
+}
+
+void LSystem::onlyAdvance(LSystem::LDrawState *curr) {
+	curr -> position += glm::vec2(glm::cos(glm::radians(curr -> facing)), glm::sin(glm::radians(curr -> facing)));
+}
+
+void LSystem::rotateWiddershins(LSystem::LDrawState *curr) {
+	curr -> facing += angle;
+}
+
+void LSystem::rotateSunwise(LSystem::LDrawState *curr) {
+	curr -> facing -= angle;
+}
+
 
 // Add given geometry to the OpenGL vertex buffer and update state accordingly
 void LSystem::addVerts(std::vector<glm::vec2>& verts) {
